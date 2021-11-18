@@ -1,7 +1,9 @@
 const express = require('express');
-const faker = require('faker');
+const routerApi = require('./routes');
+const { logErrors, errorHandler } = require('./middlewares/error.handler.js');
 const app = express();
 const port = 6969;
+app.use(express.json());
 
 app.get('/', (req,res) => {
   res.send('Hola soy un server en Express');
@@ -33,20 +35,10 @@ app.get('/people/:id', (req,res) => {
   });
 });
 
-app.get('/products', (req,res) => {
-  const products = [];
-  const {size} = req.query;
-  const limit = size || 10;
-  for (let i = 0; i < limit; i++) {
-    products.push({
-      name: faker.commerce.productName(),
-      price: parseInt(faker.commerce.price(), 10),
-      image: faker.image.imageUrl(),
-    });
+routerApi(app);
 
-  }
-  res.json(products);
-})
+app.use(logErrors);
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`My port: ${port}`);
